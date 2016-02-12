@@ -1,3 +1,7 @@
+/** constantes **/
+const gcc = 1;
+const java = 1;
+
 /** dépendances **/
 const express         = require('express');
 const bodyParser      = require('body-parser');
@@ -23,14 +27,35 @@ app.get('/', urlencodedParser, function (req, res) {
 
 // POST 
 app.post('/', urlencodedParser, function (req, res) {
+
+  // formulaire vide
   if (!req.body) return res.sendStatus(400);
 
-  var cParser = commandParser(req.body.command);
+  // pré-formatage de la commande
+  var parser = commandParser(req.body.command);
   
-  res.send('Nom du processus executée: ' + cParser.getProcessName());
+  // on détermine quel processus doit être executé
+  var processId =  parser.getProcessId();
 
-  // exemple d'exec gcc
-  process.gcc("prog.c","progCompil");
+  // analyse et execution de la commande
+  switch (processId)
+  {
+  	case gcc :
+
+  		try {
+  	 		var cmd = parser.gcc();
+  	 		process.gcc( cmd.fileIn , cmd.fileOut );
+  	 	} 
+  	 	catch (e)
+  	 	{
+  	 		console.log(e);
+  	 	}
+  	break;
+
+  	case java :
+  	break;
+  }
+
 });
 
 app.listen(8080);
