@@ -5,7 +5,8 @@ module.exports = (command) =>  {
     return { 
 
     // retourne le nom du processus à exectuer
-    getProcessName: () => commandSplit[0]
+    getProcessName: () => commandSplit[0],
+    gcc: () => { /*parse gcc comand */},
     };
 
 }
