@@ -6,7 +6,6 @@ module.exports = (command) =>  {
 
     // retourne le nom du processus à exectuer
     getProcessName: () => commandSplit[0]
-
     };
 
 }
