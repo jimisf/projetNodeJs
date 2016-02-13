@@ -1,19 +1,18 @@
 /** constantes **/
-const gcc = 1;
-const java = 1;
+const generic   = 0;
+const gcc       = 1;
+const java      = 2;
+
 
 /** dépendances **/
 const express         = require('express');
 const bodyParser      = require('body-parser');
 const commandParser   = require('./commandParser');
 const processus       = require('./processus');
-
-
+    
 var app         = express();
 var jsonParser  = bodyParser.json();
 var process     = processus();
-
-
 
 // creation du parser application/x-www-form-urlencoded
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
@@ -54,6 +53,11 @@ app.post('/', urlencodedParser, function (req, res) {
 
   	case java :
   	break;
+
+    case generic :
+      var cmd = parser.generic();
+      process.generic( cmd.processName , cmd.arguments );
+
   }
 
 });
