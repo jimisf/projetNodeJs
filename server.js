@@ -10,20 +10,21 @@ const bodyParser      = require('body-parser');
 const commandParser   = require('./commandParser');
 const processus       = require('./processus');
 const graphHandler    = require('./graphHandler');
+const svgAPI          = require('./svg.js');
     
+/** global **/
 var app         = express();
 var jsonParser  = bodyParser.json();
 var process     = processus();
+var svg         = null;
+
+//setter
+function setSVG(value){
+    svg = value;
+}
 
 // creation du parser application/x-www-form-urlencoded
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
-
-// GET
-app.get('/', urlencodedParser, function (req, res) {
-  if (!req.body) return res.sendStatus(400);
-  res.writeHead(200, {"Content-Type": "text/html"});
-  res.write('<form method="post" action="/"><input type="text" name="command"><input type="submit" value="exec"></form>');
-});
 
 // POST 
 app.post('/', urlencodedParser, function (req, res) {
@@ -111,7 +112,7 @@ var graph = {
     }
 };
 
-console.log(graph);
+
 
 var _graph = graphHandler(graph);
 
@@ -119,6 +120,22 @@ _graph.addActivity("a1");
 _graph.addEntity("e1");
 _graph.addRelation.used("used?3",'e1','a1');
 
-console.log(JSON.stringfy(graph));
+
+// exemple de conversion graph->svg
+svgAPI(graph,setSVG);
+
+
+// GET
+app.get('/', urlencodedParser, function (req, res) {
+  if (!req.body) return res.sendStatus(400);
+  res.writeHead(200, {"Content-Type": "text/html"});
+  res.write('<form method="post" action="/"><input type="text" name="command"><input type="submit" value="exec"></form>'+svg);
+});
+
+
+
+
+
+
 
 
