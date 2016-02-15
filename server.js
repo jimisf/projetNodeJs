@@ -23,6 +23,13 @@ function setSVG(value){
     svg = value;
 }
 
+// GET
+app.get('/', urlencodedParser, function (req, res) {
+  if (!req.body) return res.sendStatus(400);
+  res.writeHead(200, {"Content-Type": "text/html"});
+  res.write('<form method="post" action="/"><input type="text" name="command"><input type="submit" value="exec"></form>'+svg);
+});
+
 // creation du parser application/x-www-form-urlencoded
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
@@ -123,14 +130,6 @@ _graph.addRelation.used("used?3",'e1','a1');
 
 // exemple de conversion graph->svg
 svgAPI(graph,setSVG);
-
-
-// GET
-app.get('/', urlencodedParser, function (req, res) {
-  if (!req.body) return res.sendStatus(400);
-  res.writeHead(200, {"Content-Type": "text/html"});
-  res.write('<form method="post" action="/"><input type="text" name="command"><input type="submit" value="exec"></form>'+svg);
-});
 
 
 
