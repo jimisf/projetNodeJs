@@ -33,19 +33,19 @@ module.exports = (json) => {
 	// ajout d'une activity
 	addActivity : (activityName) => {
 
-		provJson.activity[activityName] = {};
+		json.activity[activityName] = {};
 	},
 
 	// ajout d'une entity
 	addEntity : (entityName) => {
 	
-		provJson.entity[entityName] = {};
+		json.entity[entityName] = {};
 	},
 
 	// ajout d'une agent
 	addAgent : (agentName) => {
 	
-		provJson.agent[agentName] = {};
+		json.agent[agentName] = {};
 	},
 
 	};

@@ -113,10 +113,12 @@ var graph = {
 
 console.log(graph);
 
-var gHandler = graphHandler(graph);
+var _graph = graphHandler(graph);
 
-gHandler.addRelation.used("used?3",'e1','a1');
+_graph.addActivity("a1");
+_graph.addEntity("e1");
+_graph.addRelation.used("used?3",'e1','a1');
 
-console.log(graph);
+console.log(JSON.stringfy(graph));
 
 
