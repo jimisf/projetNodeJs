@@ -9,6 +9,7 @@ const express         = require('express');
 const bodyParser      = require('body-parser');
 const commandParser   = require('./commandParser');
 const processus       = require('./processus');
+const graphHandler    = require('./graphHandler');
     
 var app         = express();
 var jsonParser  = bodyParser.json();
@@ -63,5 +64,59 @@ app.post('/', urlencodedParser, function (req, res) {
 });
 
 app.listen(8080);
+
+
+// TEST de manipulation d'un graph
+var graph = {
+    "prefix": {
+        "default": "http://example.org/"
+    },
+    "entity": {
+        "EntityUsed1": {},
+        "EntityUsedN": {},
+        "EntityGenerated1": {},
+        "EntityGeneratedN": {}
+    },
+    "activity": {
+        "Activity": {}
+    },
+    "agent": {
+        "Agent": {}
+    },
+    "used": {
+        "use?0": {
+            "prov:activity": "Activity",
+            "prov:entity": "EntityUsed1"
+        },
+        "use?1": {
+            "prov:activity": "Activity",
+            "prov:entity": "EntityUsedN"
+        }
+    },
+    "wasGeneratedBy": {
+        "gen?0": {
+            "prov:entity": "EntityGenerated1",
+            "prov:activity": "Activity"
+        },
+        "gen?1": {
+            "prov:entity": "EntityGeneratedN",
+            "prov:activity": "Activity"
+        }
+    },
+    "wasAssociatedWith": {
+        "assoc?0": {
+            "prov:activity": "Activity",
+            "prov:agent": "Agent"
+        }
+    }
+};
+
+console.log(graph);
+
+var gHandler = graphHandler(graph);
+
+gHandler.addRelation.used("used?3",'e1','a1');
+
+console.log(graph);
 
 
