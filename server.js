@@ -23,15 +23,16 @@ function setSVG(value){
     svg = value;
 }
 
+
+// creation du parser application/x-www-form-urlencoded
+var urlencodedParser = bodyParser.urlencoded({ extended: false })
+
 // GET
 app.get('/', urlencodedParser, function (req, res) {
   if (!req.body) return res.sendStatus(400);
   res.writeHead(200, {"Content-Type": "text/html"});
   res.write('<form method="post" action="/"><input type="text" name="command"><input type="submit" value="exec"></form>'+svg);
 });
-
-// creation du parser application/x-www-form-urlencoded
-var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
 // POST 
 app.post('/', urlencodedParser, function (req, res) {
