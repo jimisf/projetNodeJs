@@ -17,6 +17,7 @@ var app         = express();
 var jsonParser  = bodyParser.json();
 var process     = processus();
 var svg         = null;
+var port		= 8080;
 
 //setter
 function setSVG(value){
@@ -72,7 +73,7 @@ app.post('/', urlencodedParser, function (req, res) {
 
 });
 
-app.listen(8080);
+app.listen(port);
 
 
 // TEST de manipulation d'un graph
