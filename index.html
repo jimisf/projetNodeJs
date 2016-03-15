@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Socket.io</title>
+        <script src="/socket.io/socket.io.js"></script>
+    </head>
+
+    
+ 
+    <body>
+
+        <h1>Graph monitoring:</h1>
+        <button onclick="exec('concat.bat t1.txt t2.txt t3.txt')"/> concat.bat t1.txt t2.txt t3.txt </button></br></br>
+        <button onclick="exec('gcc prog.c -o out.exe')"/> gcc prog.c -o out.exe </button></br></br>
+        <div><input type="text"/> <button onclick="exec(this.parentElement.firstChild.value)"/>Execute</button></div>
+        <div id="graph"></div>
+        
+
+    </body>
+
+            <script>
+
+            var socket = io.connect('http://localhost:8080');
+            socket.emit('join', {id: 1});
+
+            var exec = function (cmd) {
+                socket.emit('execCommand', {'id':1,'command':cmd} );
+            }   
+
+            socket.on('newGraph', function(svg) {
+                document.getElementById("graph").innerHTML = svg;
+            })
+
+     </script>
+
+
+
+
+</html>

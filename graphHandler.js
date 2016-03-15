@@ -1,51 +1,60 @@
 module.exports = (json) => {
 
+	var nbUsed = 0;
+	var nbAssoc = 0;
+	var nbRelation = 0;
 	return {
 
 	// gère les ajouts de relation
 	addRelation : {
 
-		used : (relationName, activityName , entityName ) => {
+		used : (activityName , entityName ) => {
 		
-			json.used[relationName] = {
+			json.used["used?"+nbUsed] = {
 				"prov:activity"	: activityName,
 				"prov:entity"	: entityName,
 			};
+			nbUsed++;
 		},
 
-		wasGeneratedBy : (relationName, activityName , entityName ) => {
+		wasGeneratedBy : (activityName , entityName ) => {
 		
-			json.wasGeneratedBy[relationName] = {
+			json.wasGeneratedBy["gen?"+nbRelation] = {
 				"prov:entity"	: entityName,
 				"prov:activity"	: activityName,
 			};
+			nbRelation++;
 		},
 
-		wasAssociatedWith : (relationName, activityName , agentName ) => {
+		wasAssociatedWith : (activityName , agentName ) => {
 		
-			json.wasAssociatedWith[relationName] = {
+			json.wasAssociatedWith["assoc?"+nbAssoc] = {
 				"prov:activity"	: activityName,
 				"prov:agent"	: agentName,
 			};
+			nbAssoc++;
 		},
 	},
 
 	// ajout d'une activity
 	addActivity : (activityName) => {
 
-		json.activity[activityName] = {};
+		if( json.activity[activityName] == undefined) 
+			json.activity[activityName] = {};
 	},
 
 	// ajout d'une entity
 	addEntity : (entityName) => {
-	
-		json.entity[entityName] = {};
+
+		if( json.entity[entityName] == undefined) 
+			json.entity[entityName] = {};
 	},
 
 	// ajout d'une agent
 	addAgent : (agentName) => {
 	
-		json.agent[agentName] = {};
+		if( json.agent[agentName] == undefined) 
+			json.agent[agentName] = {};
 	},
 
 	};

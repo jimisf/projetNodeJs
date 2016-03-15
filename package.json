@@ -1,3 +1,6 @@
 {
-	"name":"projetNodeJs"
+  "name": "projetNodeJs",
+  "devDependencies": {
+    "chai": "^3.5.0"
+  }
 }

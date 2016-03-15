@@ -5,78 +5,216 @@ const java      = 2;
 
 
 /** dépendances **/
-const express         = require('express');
-const bodyParser      = require('body-parser');
+
+const http            = require('http');
+const fs              = require('fs');
+
 const commandParser   = require('./commandParser');
 const processus       = require('./processus');
 const graphHandler    = require('./graphHandler');
 const svgAPI          = require('./svg.js');
+const mediatorAPI     = require('./askPermission.js');
     
 /** global **/
-var app         = express();
-var jsonParser  = bodyParser.json();
 var process     = processus();
 var svg         = null;
+<<<<<<< HEAD
+var setUsed     = {};
+var setActivity = {};
+var graph       = {
+    "prefix": {
+        "default": "http://example.org/"
+    },
+    "entity": {
+    },
+    "activity": {
+    },
+    "agent": {
+        "Server": {}
+    },
+    "used": {
+    },
+    "wasGeneratedBy": {
+    },
+    "wasAssociatedWith": {
+    }
+};
+var _graph      = graphHandler(graph);
+=======
+var port		= 8080;
 
 //setter
 function setSVG(value){
     svg = value;
 }
+>>>>>>> origin/master
 
 
-// creation du parser application/x-www-form-urlencoded
-var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
-// GET
-app.get('/', urlencodedParser, function (req, res) {
-  if (!req.body) return res.sendStatus(400);
-  res.writeHead(200, {"Content-Type": "text/html"});
-  res.write('<form method="post" action="/"><input type="text" name="command"><input type="submit" value="exec"></form>'+svg);
+// Chargement du fichier index.html affiché au client
+var server = http.createServer(function(req, res) {
+    fs.readFile('./index.html', 'utf-8', function(error, content) {
+        res.writeHead(200, {"Content-Type": "text/html"});
+        res.end(content);
+    });
 });
 
-// POST 
-app.post('/', urlencodedParser, function (req, res) {
+// Chargement de socket.io
+var io = require('socket.io').listen(server);
 
-  // formulaire vide
-  if (!req.body) return res.sendStatus(400);
+// Quand un client se connecte, on le note dans la console
+io.sockets.on('connection', function (socket) {
 
-  // pré-formatage de la commande
-  var parser = commandParser(req.body.command);
-  
-  // on détermine quel processus doit être executé
-  var processId =  parser.getProcessId();
+    socket.on('join', function (data) {
+      console.log("new client with id:"+data.id);
+      socket.join(data.id); 
+    });
 
-  // analyse et execution de la commande
-  switch (processId)
-  {
-  	case gcc :
+    socket.on('execCommand', function(data) 
+    {
 
-  		try {
-  	 		var cmd = parser.gcc();
-  	 		process.gcc( cmd.fileIn , cmd.fileOut );
-  	 	} 
-  	 	catch (e)
-  	 	{
-  	 		console.log(e);
-  	 	}
-  	break;
+        var cmd = data.command;
 
-  	case java :
-  	break;
+        // pré-formatage de la commande
+        var parser = commandParser(cmd);
 
-    case generic :
-      var cmd = parser.generic();
-      process.generic( cmd.processName , cmd.arguments );
+        /////////////////////////////////////////////////
+        ///////////////PARSING & EXEC////////////////////
+        /////////////////////////////////////////////////
+        mediatorAPI(parser,function(v,p)
+        {
+            var setToWatch = {};
+            var cmd = parser.generic();
 
-  }
+            if(setActivity[cmd.processName] == undefined) setActivity[cmd.processName] = new nameVersioning(cmd.processName,'');
+
+            setActivity[cmd.processName].version++;
+            var porcessName = setActivity[cmd.processName].getName();
+
+
+            _graph.addActivity(porcessName);
+            _graph.addRelation.wasAssociatedWith(porcessName,"Server");
+            
+
+            // 1 - fichier qui existe
+            for ( var index in cmd.arguments )
+            {
+                if ( setUsed[cmd.arguments[index]] != undefined){
+                    _graph.addRelation.used(porcessName,setUsed[cmd.arguments[index]].getName());
+                }else {
+                    if(cmd.arguments[index][0] !== '-')
+                        setToWatch[cmd.arguments[index]] = true;
+                }  
+            }
+
+            // 2 - check toWatch
+            console.log('\n2 - check set toWatch');
+            for ( var fileName in setToWatch )
+            {
+                
+
+                if (fs.existsSync(fileName)) 
+                {
+
+                    setUsed[fileName] = new nameVersioning(fileName,fs.statSync(fileName).ctime.toString().split(' ')[4]);
+
+                    _graph.addEntity(setUsed[fileName].getName());
+                    _graph.addRelation.used(porcessName,setUsed[fileName].getName());
+                    delete setToWatch[fileName]; 
+                    console.log(fileName+' found');
+
+                } else {
+                    console.log(fileName+' not found');
+                }
+            }
+
+            process.generic( cmd.processName , cmd.arguments, function() { 
+                
+                
+
+                // 3 - check toWatch for output
+                console.log('\n3 - check set toWatch for output');
+                for ( var fileName in setToWatch )
+                {
+                
+
+                    if (fs.existsSync(fileName)) 
+                    {
+                        setUsed[fileName] = new nameVersioning(fileName,fs.statSync(fileName).ctime.toString().split(' ')[4]);
+                        _graph.addEntity(setUsed[fileName].getName());
+                        _graph.addRelation.wasGeneratedBy(porcessName,setUsed[fileName].getName());
+                        console.log(fileName+' .found');
+                    } else {
+                        delete setToWatch[fileName]; 
+                        console.log(fileName+' .not found');
+                    }
+                }
+
+                // 4 - check toUsed for version
+                console.log('\n4 - VERSIONING');
+                for ( var fileName in setUsed )
+                {
+                    var currentLastModif =  fs.statSync(fileName).ctime.toString().split(' ')[4];
+                    console.log(fileName+' :'+currentLastModif+" => "+setUsed[fileName].lastModify);
+
+                    if (setUsed[fileName].lastModify != currentLastModif) 
+                    {
+                        setUsed[fileName].version++;
+                        setUsed[fileName].lastModify = currentLastModif;
+                        _graph.addEntity(setUsed[fileName].getName());
+                        _graph.addRelation.wasGeneratedBy(porcessName,setUsed[fileName].getName());
+                    }
+
+                }
+
+                svgAPI(graph,data.id,io);
+
+            });
+
+
+
+        });
+         
+    });
 
 });
 
-app.listen(8080);
+<<<<<<< HEAD
+
+server.listen(8080);
+
+
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+
+
+function nameVersioning (fileName,lm)
+{
+    this.root = fileName;
+    this.version = 0;
+    this.lastModify = lm;
+
+    this.getName = function ()
+    {
+        return this.version+'-'+this.root;
+    }
+
+}
+
+
+
+
+//app.listen(8080);
+
+=======
+app.listen(port);
+>>>>>>> origin/master
 
 
 // TEST de manipulation d'un graph
-var graph = {
+/*var graph = {
     "prefix": {
         "default": "http://example.org/"
     },
@@ -87,7 +225,7 @@ var graph = {
         "EntityGeneratedN": {}
     },
     "activity": {
-        "Activity": {}
+        "Activity": {},
     },
     "agent": {
         "Agent": {}
@@ -118,21 +256,21 @@ var graph = {
             "prov:agent": "Agent"
         }
     }
-};
+};*/
 
 
 
+/*
 var _graph = graphHandler(graph);
 
 _graph.addActivity("a1");
 _graph.addEntity("e1");
 _graph.addRelation.used("used?3",'e1','a1');
 
+console.log(graph);*/
 
 // exemple de conversion graph->svg
-svgAPI(graph,setSVG);
-
-
+//svgAPI(graph,setSVG);
 
 
 
