@@ -18,7 +18,7 @@ const mediatorAPI     = require('./askPermission.js');
 /** global **/
 var process     = processus();
 var svg         = null;
-<<<<<<< HEAD
+
 var setUsed     = {};
 var setActivity = {};
 var graph       = {
@@ -40,14 +40,12 @@ var graph       = {
     }
 };
 var _graph      = graphHandler(graph);
-=======
 var port		= 8080;
 
 //setter
 function setSVG(value){
     svg = value;
 }
->>>>>>> origin/master
 
 
 
@@ -179,8 +177,6 @@ io.sockets.on('connection', function (socket) {
 
 });
 
-<<<<<<< HEAD
-
 server.listen(8080);
 
 
@@ -202,16 +198,6 @@ function nameVersioning (fileName,lm)
     }
 
 }
-
-
-
-
-//app.listen(8080);
-
-=======
-app.listen(port);
->>>>>>> origin/master
-
 
 // TEST de manipulation d'un graph
 /*var graph = {
