@@ -1,21 +1,18 @@
 module.exports = (parser,callback) =>  {
 
-    var XMLHttpRequest = require('xhr2');
+  var soap = require('soap');
+  var url = 'http://localhost:8000/mediateurmaitre?wsdl';
+  var args = {};
+  soap.createClient(url, function(err, client) {
+      client.setSecurity(new soap.WSSecurity('root', 'root'))
+      client.getAnswer(args, function(err, result) {
+          if(result.result === "YES") {
+            callback(true, parser);
+          }
+          else {
+            console.log("Le médiateur a renvoyé NO");
+          }
+      });
+  });
 
-    var request = new XMLHttpRequest();
-
-    request.open('POST', 'http://localhost:8081', true);
-    request.setRequestHeader("Content-Type",'application/json;charset=UTF-8');
-
-    request.onreadystatechange = function (aEvt) {
-        if (request.readyState == 4) {
-            if(request.status == 202){
-                callback(true,parser);
-            }
-            else
-                console.log("Error");
-        }
-    };
-
-    request.send();
 }
