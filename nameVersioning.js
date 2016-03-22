@@ -1,11 +1,15 @@
-function nameVersioning (fileName)
-{
+/* Fichier uniquement pour les tests /!\
+** Reproduit le comportement de la fonction nameVersioning de server.js
+*/
+module.exports = (fileName) => {
+	
 	this.root = fileName;
 	this.version = -1;
 
-	this.getName = function ()
-	{
-		return this.version+'-'+this.root;
+	return { 
+		getName : () =>
+		{
+			return ++this.version+'-'+this.root;
+		}
 	}
-
 }

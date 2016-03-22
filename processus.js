@@ -22,12 +22,13 @@ module.exports = () =>  {
 
 				cmd.on('close', (code) => {
 					console.log(`child process exited with code ${code}`);
-					callback();
+					callback("ok");
 
 				});
 
 				cmd.on('error', (err) => {
-          		console.log('Failed to execute command '+processName);
+          			console.log('Failed to execute command '+processName);
+          			callback("err");
         		});
 			}
 
